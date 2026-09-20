@@ -3,10 +3,10 @@
 Noise-robustness evaluation of **MediaPipe** vs **RTMPose** hand-keypoint tracking on the
 **pronation-supination (PS)** motor task, benchmarked against manually-annotated (CVAT) ground truth.
 
-Videos are degraded along three independent noise axes -- illumination, motion blur, sensor noise --
-at four severities each (clean / mild / moderate / strong), then run through both detectors to see
-how the extracted kinematic features (amplitude, speed, frequency, cycle count) and keypoint-level
-spatial accuracy hold up as video quality drops.
+Videos are degraded along three independent noise axes - illumination, motion blur, sensor noise -
+at four severities each (clean / mild / moderate / strong), then run through both keypoint detectors to see
+how the extracted kinematic features (amplitude, speed, frequency, cycle count) and the keypoint-level
+spatial accuracy varies as video quality reduces.
 
 ---
 
