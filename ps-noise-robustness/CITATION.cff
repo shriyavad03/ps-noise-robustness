@@ -1,0 +1,8 @@
+cff-version: 1.2.0
+message: "If you use this software, please cite it as below."
+title: ps-noise-robustness
+authors:
+  - family-names: Vadavalli
+    given-names: Shriya
+url: "https://github.com/<your-username>/ps-noise-robustness"
+license: MIT

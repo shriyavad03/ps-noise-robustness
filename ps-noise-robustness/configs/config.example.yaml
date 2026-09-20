@@ -1,0 +1,92 @@
+# ==============================================================================
+# HOW TO USE THIS FILE
+# ------------------------------------------------------------------------------
+# 1. Copy this file to config.yaml (config.yaml is git-ignored, so your own
+#    paths never get committed):
+#       cp configs/config.example.yaml configs/config.yaml
+# 2. Change ONLY `experiment_root` below to your own project folder.
+#    Every path under `paths:` / `split:` is a sub-folder of it by default,
+#    so changing that one line points the whole pipeline at your machine.
+# 3. (Optional) If you want a specific folder somewhere else entirely, replace
+#    just that one line with a full path starting with "/" -- it will be used
+#    as-is instead of being nested under experiment_root.
+#
+# Folders this config expects (created automatically where the pipeline
+# writes to; you only need to create the ones you're putting your own data
+# into -- PS_Data/, Trimmed_Videos/, Annotations_GroundTruth/):
+#
+#   <experiment_root>/
+#   ├── data/
+#   │   ├── PS_Data/                    raw dual-panel recordings (split_video.py input)
+#   │   │   ├── Frontal/                   -> split_video.py output (frontal half)
+#   │   │   └── Noise_Videos/Lateral/      -> split_video.py output (lateral half)
+#   │   ├── Trimmed_Videos/             trimmed clean recordings (add_noise.py input)
+#   │   ├── ModifiedNoise/              add_noise.py output == run_pipeline.py input
+#   │   └── Annotations_GroundTruth/    CVAT ground-truth exports
+#   ├── models/
+#   │   └── hand_landmarker.task        MediaPipe model (auto-downloaded if missing)
+#   └── results/
+#       └── results_noise/              run_pipeline.py CSV outputs
+# ==============================================================================
+
+# CHANGE ME: your own project folder, e.g. /Users/yourname/Experiment/YourProject
+experiment_root: /Users/shriyavadavalli/Experiment/PS_Noise_Robustness
+
+# ------------------------------------------------------------------------------
+# Paths used by run_pipeline.py (and add_noise.py). All relative to
+# experiment_root above -- replace any single value with a full "/..." path
+# to move just that one folder somewhere else.
+# ------------------------------------------------------------------------------
+paths:
+  # Trimmed source recordings, before noise is added. Read by add_noise.py.
+  trimmed_videos_dir: data/Trimmed_Videos
+
+  # Root of the noise-degraded video tree: root_dir/{video_id}/{noise_type}/{severity}/*.mp4
+  # Written BY add_noise.py, then read BY run_pipeline.py -- keep this as one
+  # shared folder unless you have a reason to separate them.
+  root_dir: data/ModifiedNoise
+
+  # Manually-annotated (CVAT) ground-truth exports. Matched to videos by
+  # participant number + hand side -- see README > Ground truth (CVAT).
+  gt_dir: data/Annotations_GroundTruth
+
+  # Where run_pipeline.py writes its three output CSVs.
+  out_dir: results/results_noise
+
+  # Cached MediaPipe hand-landmarker model file. Downloaded here automatically
+  # the first time the pipeline runs, if not already present.
+  model_cache: models/hand_landmarker.task
+
+# ------------------------------------------------------------------------------
+# Video-splitting paths, used by split_video.py only. Also relative to
+# experiment_root. Skip this section if your recordings are already
+# single-panel and you don't need to split frontal/lateral views apart.
+# ------------------------------------------------------------------------------
+split:
+  # Raw dual-panel recordings to split.
+  root_dir: data/PS_Data
+  # Cropped frontal (left) half goes here.
+  frontal_dir: data/PS_Data/Frontal
+  # Cropped lateral (right) half goes here.
+  lateral_dir: data/PS_Data/Noise_Videos/Lateral
+
+# ------------------------------------------------------------------------------
+# Run options for run_pipeline.py.
+# ------------------------------------------------------------------------------
+run:
+  force_hand_side: null   # null = auto-detect from video_id, or "Left" / "Right"
+  forced_fps: 0            # 0 = read fps from each video file
+
+# ------------------------------------------------------------------------------
+# RTMPose model settings.
+# ------------------------------------------------------------------------------
+rtmpose:
+  mode: performance         # lightweight | balanced | performance
+  backend: onnxruntime
+
+# ------------------------------------------------------------------------------
+# Peak/trough (cycle) detection tuning -- adjust if cycles are over/under-detected.
+# ------------------------------------------------------------------------------
+cycle_detection:
+  peak_prominence_deg: 15.0
+  peak_min_distance_s: 0.3
